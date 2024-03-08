@@ -62,6 +62,9 @@ const userResolver = {
     login: async (_, { input }, context) => {
       try {
         const { username, password } = input; // Obtém o nome de usuário e a senha do formulário de login
+        if (!username || !password)
+          throw new Error("Todos os campos são necessários.");
+
         const { user } = await context.authenticate("graphql-local", {
           // Autentica o usuário
           username,
@@ -79,11 +82,11 @@ const userResolver = {
     logout: async (_, __, context) => {
       try {
         await context.logout(); // Faz logout do usuário
-        req.session.destroy((err) => {
+        context.req.session.destroy((err) => {
           // Destrói a sessão do usuário
           if (err) throw err; // Lança um erro se houver algum problema
         });
-        res.clearCookie("connect.sid"); // Limpa o cookie de sessão
+        context.res.clearCookie("connect.sid"); // Limpa o cookie de sessão
 
         return { message: "Desconectado com sucesso" }; // Retorna uma mensagem de sucesso
       } catch (error) {

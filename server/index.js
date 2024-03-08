@@ -61,7 +61,7 @@ const server = new ApolloServer({
 await server.start(); // Inicia o servidor Apollo GraphQL
 
 app.use(
-  "/", // Rota raiz
+  "/graphql", // Rota raiz
   cors({
     origin: "http://localhost:3000", // Origem permitida para solicitações
     credentials: true, // Permite o envio de credenciais (por exemplo, cookies)
@@ -77,4 +77,4 @@ app.use(
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 await connectDB(); // Conecta ao banco de dados MongoDB
 
-console.log(`🚀 Server ready at http://localhost:4000/`); // Exibe mensagem indicando que o servidor está pronto
+console.log(`🚀 Server ready at http://localhost:4000/graphql`); // Exibe mensagem indicando que o servidor está pronto

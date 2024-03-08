@@ -18,7 +18,7 @@ export const configurePassport = async () => {
       const user = await User.findById(id); // Procura o usuário pelo ID no banco de dados
       done(null, user); // Retorna o usuário encontrado
     } catch (error) {
-      done(err); // Se houver um erro, retorna o erro
+      done(error); // Se houver um erro, retorna o erro
     }
   });
 
@@ -37,7 +37,7 @@ export const configurePassport = async () => {
         }
         return done(null, user); // Se o usuário for autenticado com sucesso, retorna o usuário
       } catch (error) {
-        return done(err); // Se houver um erro durante o processo de autenticação, retorna o erro
+        return done(error); // Se houver um erro durante o processo de autenticação, retorna o erro
       }
     })
   );
