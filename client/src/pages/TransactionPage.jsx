@@ -7,14 +7,23 @@ import toast from "react-hot-toast";
 import TransactionFormSkeleton from "./../components/skeletons/TransactionFormSkeleton";
 
 const TransactionPage = () => {
+  // Obtém o ID da transação da URL
   const { id } = useParams();
+
+  // Consulta para obter os detalhes da transação com base no ID
   const { loading, data } = useQuery(GET_TRANSACTION, {
     variables: { id: id },
   });
 
-  const [updateTransaction, { lodaing: loadingUpdate }] =
-    useMutation(UPDATE_TRANSACTION);
+  // Mutation para atualizar uma transação existente
+  const [updateTransaction, { loading: loadingUpdate }] = useMutation(
+    UPDATE_TRANSACTION,
+    {
+      refetchQueries: ["GetTransaction", "GetTransactionsStatics"],
+    }
+  );
 
+  // Estado local para armazenar os dados do formulário
   const [formData, setFormData] = useState({
     description: data?.transaction?.description || "",
     paymentType: data?.transaction?.paymentType || "",
@@ -24,11 +33,13 @@ const TransactionPage = () => {
     date: data?.transaction?.date || "",
   });
 
+  // Manipulador de envio do formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
     const amount = parseFloat(formData.amount);
 
     try {
+      // Executa a mutação de atualização da transação
       await updateTransaction({
         variables: {
           input: {
@@ -43,6 +54,8 @@ const TransactionPage = () => {
       toast.error(error.message);
     }
   };
+
+  // Manipulador de alterações nos campos do formulário
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -51,6 +64,7 @@ const TransactionPage = () => {
     }));
   };
 
+  // Atualiza o estado do formulário quando os dados da transação são carregados
   useEffect(() => {
     if (data) {
       setFormData({
@@ -64,8 +78,10 @@ const TransactionPage = () => {
     }
   }, [data]);
 
+  // Retorna um esqueleto de formulário enquanto os dados estão sendo carregados
   if (loading) return <TransactionFormSkeleton />;
 
+  // Renderiza o formulário de atualização da transação
   return (
     <div className="h-screen max-w-4xl mx-auto flex flex-col items-center">
       <p className="md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text">
@@ -75,7 +91,7 @@ const TransactionPage = () => {
         className="w-full max-w-lg flex flex-col gap-5 px-3 "
         onSubmit={handleSubmit}
       >
-        {/* TRANSACTION */}
+        {/* Campo para descrição da transação */}
         <div className="flex flex-wrap">
           <div className="w-full">
             <label
@@ -95,7 +111,7 @@ const TransactionPage = () => {
             />
           </div>
         </div>
-        {/* PAYMENT TYPE */}
+        {/* Campo para tipo de pagamento */}
         <div className="flex flex-wrap gap-3">
           <div className="w-full flex-1 mb-6 md:mb-0">
             <label
@@ -126,8 +142,7 @@ const TransactionPage = () => {
               </div>
             </div>
           </div>
-
-          {/* CATEGORY */}
+          {/* Campo para categoria */}
           <div className="w-full flex-1 mb-6 md:mb-0">
             <label
               className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
@@ -158,8 +173,7 @@ const TransactionPage = () => {
               </div>
             </div>
           </div>
-
-          {/* AMOUNT */}
+          {/* Campo para valor da transação */}
           <div className="w-full flex-1 mb-6 md:mb-0">
             <label
               className="block uppercase text-white text-xs font-bold mb-2"
@@ -178,8 +192,7 @@ const TransactionPage = () => {
             />
           </div>
         </div>
-
-        {/* LOCATION */}
+        {/* Campo para localização */}
         <div className="flex flex-wrap gap-3">
           <div className="w-full flex-1 mb-6 md:mb-0">
             <label
@@ -198,8 +211,7 @@ const TransactionPage = () => {
               onChange={handleInputChange}
             />
           </div>
-
-          {/* DATE */}
+          {/* Campo para data */}
           <div className="w-full flex-1">
             <label
               className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
@@ -219,7 +231,7 @@ const TransactionPage = () => {
             />
           </div>
         </div>
-        {/* SUBMIT BUTTON */}
+        {/* Botão de envio do formulário */}
         <button
           className="text-white font-bold w-full rounded px-4 py-2 bg-gradient-to-br
           from-pink-500 to-pink-500 hover:from-pink-600 hover:to-pink-600"
@@ -231,4 +243,5 @@ const TransactionPage = () => {
     </div>
   );
 };
+
 export default TransactionPage;

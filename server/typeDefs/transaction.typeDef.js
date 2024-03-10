@@ -10,13 +10,15 @@ const transactionTypeDef = `#graphql
         amount: Float! # Valor da transação
         location: String! # Local da transação
         date: String! # Data da transação
+        user: User!
+
     }
 
     # Consultas disponíveis para transações.
     type Query {
         transactions: [Transaction!]! # Consulta para obter todas as transações
         transaction(transactionId:ID!): Transaction # Consulta para obter uma transação pelo ID
-        # TODO =: ADD categoryStatics query
+        categoryStatistics: [CategoryStatistics!]
     }
 
 
@@ -25,6 +27,12 @@ const transactionTypeDef = `#graphql
         createTransaction(input: CreateTransactionInput!): Transaction! # Mutação para criar uma nova transação
         updateTransaction(input: UpdateTransactionInput!): Transaction! # Mutação para atualizar uma transação existente
         deleteTransaction(transactionId:ID!): Transaction! # Mutação para excluir uma transação
+    }
+
+    # Tipo que representa estatísticas de categoria de transações.
+    type CategoryStatistics {
+        category: String! # A categoria da transação
+        totalAmount: Float! # O valor total das transações na categoria
     }
 
 

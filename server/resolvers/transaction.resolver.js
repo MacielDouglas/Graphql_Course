@@ -1,3 +1,4 @@
+import User from "../models/user.model.js";
 import Transaction from "./../models/transiction.model.js";
 
 const transactionResolver = {
@@ -23,7 +24,33 @@ const transactionResolver = {
         throw new Error("Erro ao obter transação");
       }
     },
-    // TODO =: ADD categoryStatics query
+    categoryStatistics: async (_, __, context) => {
+      try {
+        if (!context.getUser()) throw new Error("Não autorizado."); // Verifica se o usuário está autenticado
+        const userId = context.getUser()._id; // Obtém o ID do usuário autenticado
+        const transactions = await Transaction.find({ userId }); // Busca as transações do usuário
+
+        // Inicializa um mapa para armazenar a soma dos valores por categoria
+        const categoryMap = {};
+
+        // Calcula a soma dos valores para cada categoria
+        transactions.forEach((transaction) => {
+          if (!categoryMap[transaction.category]) {
+            categoryMap[transaction.category] = 0;
+          }
+          categoryMap[transaction.category] += transaction.amount;
+        });
+
+        // Converte o mapa em uma lista de objetos contendo a categoria e o total de valores
+        return Object.entries(categoryMap).map(([category, totalAmount]) => ({
+          category,
+          totalAmount,
+        }));
+      } catch (error) {
+        console.error("Erro ao obter estatísticas de categoria: ", error); // Registra o erro
+        throw new Error("Erro ao obter estatísticas de categoria."); // Lança um erro
+      }
+    },
   },
   Mutation: {
     createTransaction: async (_, { input }, context) => {
@@ -68,7 +95,18 @@ const transactionResolver = {
       }
     },
   },
-  //TODO => ADD TRANSACTION/USER RELATIONSHIP
+  Transaction: {
+    user: async (parent) => {
+      const userId = parent.userId;
+      try {
+        const user = await User.findById(userId);
+        return user;
+      } catch (error) {
+        console.error("Erro ao getting user: ", error);
+        throw new Error("Error getting user.");
+      }
+    },
+  },
 };
 
 export default transactionResolver; // Exporta os resolvers de transação
